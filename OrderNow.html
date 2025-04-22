@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html ng-app="foodApp">
+
+<head>
+   
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .menu-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between; /* Adjust the alignment as needed */
+        }
+
+        .menu-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            width: calc(33.33% - 20px); /* Calculate width to accommodate three items in a row */
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .cart {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .order-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .menu-item img {
+            width: 60%; /* Make the image fill the container */
+            height: 200px; /* Fixed height for all images */
+            object-fit: cover; /* Maintain aspect ratio and cover the container */
+            margin-bottom: 10px;
+        }
+        /* footer section*/
+.footer_section {
+  background-color: #222831;
+  color: #ffffff;
+  padding: 75px 0 40px 0;
+  text-align: center;
+}
+
+.footer_section h4 {
+  font-size: 28px;
+}
+
+.footer_section h4,
+.footer_section .footer-logo {
+  font-weight: 600;
+  margin-bottom: 20px;
+  font-family: 'Dancing Script', cursive;
+}
+
+.footer_section p {
+  color: #dbdbdb;
+}
+
+.footer_section .footer-col {
+  margin-bottom: 30px;
+}
+
+.footer_section .footer_contact .contact_link_box {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.footer_section .footer_contact .contact_link_box a {
+  margin: 5px 0;
+  color: #ffffff;
+}
+
+.footer_section .footer_contact .contact_link_box a i {
+  margin-right: 5px;
+}
+
+.footer_section .footer_contact .contact_link_box a:hover {
+  color: #ffbe33;
+}
+
+.footer_section .footer-logo {
+  display: block;
+  font-weight: bold;
+  font-size: 38px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.footer_section .footer_social {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.footer_section .footer_social a {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  color: #222831;
+  width: 30px;
+  height: 30px;
+  border-radius: 100%;
+  background-color: #ffffff;
+  border-radius: 100%;
+  margin: 0 2.5px;
+  font-size: 18px;
+}
+
+.footer_section .footer_social a:hover {
+  color: #ffbe33;
+}
+
+.footer_section .footer-info {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.footer_section .footer-info p {
+  color: #ffffff;
+  margin: 0;
+}
+
+.footer_section .footer-info p a {
+  color: inherit;
+}
+/*# sourceMappingURL=style.css.map */
+
+    </style>
+    
+</head>
+
+<body ng-controller="foodController">
+
+    <h1>Food Menu</h1>
+
+    <div class="menu-container">
+        <div class="menu-item" ng-repeat="item in menu">
+            <div class="card">
+                <img ng-src="{{item.image}}" alt="{{item.name}}">
+                <div class="card-body">
+                    <h3 class="card-title">{{item.name}}</h3>
+                    <p class="card-text">{{item.description}}</p>
+                    <p class="card-text">Price: {{calculateItemPrice(item)}}</p>
+                    <label>Size:
+                        <select ng-model="item.size" ng-options="size for size in item.sizes"></select>
+                    </label>
+                    <label>Quantity:
+                        <input type="number" ng-model="item.quantity" min="1" />
+                    </label><br><br>
+                    <button ng-click="addToCart(item)">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart">
+        <h2>Shopping Cart</h2>
+        <ul>
+            <li ng-repeat-start="cartItem in cart">
+                {{cartItem.name}} ({{cartItem.size}}) - {{calculateItemPrice(cartItem)}} - Quantity: {{cartItem.quantity}}
+            </li>
+            <button ng-repeat-end ng-click="removeFromCart(index)">Remove</button>
+        </ul>
+        <button class="order-btn" ng-click="placeOrder()">Place Order</button>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    
+    <script>
+        var app = angular.module('foodApp', []);
+
+        app.controller('foodController', function ($scope) {
+            $scope.menu = [
+                { name: ' Margherita Pizza',sizes: ['Regular', 'Medium'], prices: [99, 199], size: 'Medium', quantity: 1, image: 'images/margherita pizza.png' },
+                { name: '  Cheese Pizza', sizes: ['Regular', 'Medium'], prices: [99, 199], size: 'Medium', quantity: 1, image: 'images/r2.png' },
+                { name: ' Mexicon Pizza', sizes: ['Regular', 'Medium'], prices: [99, 199], size: 'Medium', quantity: 1, image: 'images/r3.jpg' },
+
+                { name: '  Veggie Burger', description: 'Classic beef burger with cheese', sizes: ['Regular', 'Medium', 'King'], prices: [149, 179,199], size: 'Medium', quantity: 1, image: 'images/b1.jpeg' },
+                { name: ' Cheese Burger', description: 'Classic beef burger with cheese', sizes: ['Regular', 'Medium', 'King'], prices: [149, 179,199], size: 'Medium', quantity: 1, image: 'images/f2.png' },
+                { name: ' Maharaja Burger', description: 'Classic beef burger with cheese', sizes: ['Regular', 'Medium', 'King'], prices: [149, 179,299], size: 'Medium', quantity: 1, image: 'images/r8.png' },
+
+                { name: 'Ravioli Pasta', description: 'Delicious pizza with various toppings', sizes: ['Normal', 'Spicy'], prices: [149, 149, 149], size: 'Medium', quantity: 1, image: 'images/r10.webp' },
+                { name: 'Spaghetti Pasta', description: 'Classic beef burger with cheese', sizes: ['Normal', 'Spicy'], prices: [169, 169,169], size: 'Single', quantity: 1, image:'images/s1.png'},
+                { name: 'Farfalle Pasta', description: 'Fresh garden salad with dressing', sizes: ['Normal', 'Spicy'], prices: [189, 189,189], size: 'Regular', quantity: 1, image: 'images/s2.avif'},
+
+                { name: 'Peri Peri Fries', description: 'Delicious pizza with various toppings', sizes: ['Regular', 'Medium', 'Large'], prices: [139, 149, 169], size: 'Medium', quantity: 1, image: 'images/p1.png' },
+                { name: 'Potato wedges', description: 'Classic beef burger with cheese', sizes: ['Regular', 'Medium', 'Large'], prices: [99, 149, 169], size: 'Single', quantity: 1, image: 'images/p4.png'  },
+                { name: 'French Fries', description: 'Fresh garden salad with dressing', sizes: ['Regular', 'Medium', 'Large'], prices: [99, 149, 169], size: 'Regular', quantity: 1, image: 'images/s7.png' },
+
+                { name: 'fruit salad', description: 'Delicious pizza with various toppings', sizes: ['Small', 'Medium', 'Large'], prices: [45, 60, 75], size: 'Medium', quantity: 1, image: 'images/s8.jpeg' },
+                { name: 'chocozilla', description: 'Classic beef burger with cheese', sizes: ['Small', 'Medium', 'Large'], prices: [45, 60, 75], size: 'Single', quantity: 1, image: 'images/s10.png' },
+                { name: 'Ice Cream', description: 'Fresh garden salad with dressing', sizes: ['Small', 'Medium', 'Large'], prices: [45, 60, 75], size: 'Regular', quantity: 1, image: 'images/pmg7.png' },
+
+                { name: 'Coca Cola', description: 'Delicious pizza with various toppings', sizes: ['250 ml', '300 ml', '1 l'], prices: [20, 36, 86], size: 'Medium', quantity: 1, image: 'images/s18.png'},
+                { name: 'Pepsi', description: 'Classic beef burger with cheese', sizes: ['250 ml', '750 ml', '1 l'], prices: [30, 50,90 ], size: 'Single', quantity: 1, image: 'images/s12.png' },
+                { name: 'Thums UP', description: 'Fresh garden salad with dressing', sizes: ['300 ml', '400 ml', '1 l'], prices: [40, 50, 90], size: 'Regular', quantity: 1, image: 'images/s14.jpg' },
+
+                { name: 'Red velvet cake', description: 'Delicious pizza with various toppings', sizes: ['Half Kg', 'One Kg', 'Two Kg'], prices: [499, 649, 849], size: 'Medium', quantity: 1, image:  'images/c1.png'  },
+                { name: 'Black forest cake ', description: 'Classic beef burger with cheese', sizes: ['Half Kg', 'One Kg', 'Two Kg'], prices: [349, 549, 749], size: 'Single', quantity: 1, image: 'images/c5.jpeg' },
+                { name: 'Butterscotch Cake', description: 'Fresh garden salad with dressing', sizes: ['Half Kg', 'One Kg', 'Two Kg'], prices: [499, 699, 899], size: 'Regular', quantity: 1, image: 'images/c6.jpg' },
+
+                { name: 'Apple Cider Donut', description: 'Delicious pizza with various toppings', sizes: ['Small', 'Medium', 'Large'], prices: [59, 79, 99], size: 'Medium', quantity: 1, image:  'images/c7.webp' },
+                { name: 'Cruller Donut', description: 'Classic beef burger with cheese', sizes: ['Small', 'Medium', 'Large'], prices: [59, 79, 99], size: 'Single', quantity: 1, image:  'images/c8.webp' },
+                { name: 'Chocolate Donut', description: 'Fresh garden salad with dressing', sizes: ['Small', 'Medium', 'Large'], prices: [59, 79, 99], size: 'Regular', quantity: 1, image:'images/c9.jpeg' },
+
+                { name: 'Egg Sandwich', description: 'Delicious pizza with various toppings', sizes: [ 'Medium', 'Large'], prices: [135, 150], size: 'Medium', quantity: 1, image: 'images/ss1.jpeg'},
+                { name: 'Hamburger Fish Sandwich', description: 'Classic beef burger with cheese', sizes: ['Medium', 'Large'], prices: [184, 214], size: 'Single', quantity: 1, image: 'images/ss4.png' },
+                { name: 'Roast Beef Sandwich', description: 'Fresh garden salad with dressing', sizes: ['Medium', 'Large'], prices: [250, 310], size: 'Regular', quantity: 1, image: 'images/ss5.webp' },
+                // Add other menu items with sizes, prices, and images
+                // Add other menu items with sizes, prices, and images
+            ];
+
+            $scope.cart = [];
+
+            $scope.addToCart = function (item) {
+                $scope.cart.push(angular.copy(item));
+            };
+
+            $scope.removeFromCart = function (index) {
+                $scope.cart.splice(index, 1);
+            };
+
+            $scope.placeOrder = function () {
+                var orderDetails = 'Order placed!\n\n';
+                for (var i = 0; i < $scope.cart.length; i++) {
+                    var cartItem = $scope.cart[i];
+                    orderDetails += `${cartItem.name} (${cartItem.size}) - ${$scope.calculateItemPrice(cartItem)} - Quantity: ${cartItem.quantity}\n`;
+                }
+                orderDetails += `\nTotal Amount: ${$scope.calculateTotal()}`;
+                alert(orderDetails);
+            };
+
+            $scope.calculateItemPrice = function (item) {
+                var sizeIndex = item.sizes.indexOf(item.size);
+                var price = item.prices[sizeIndex];
+                return price * item.quantity;
+            };
+
+            $scope.calculateTotal = function () {
+                var total = 0;
+                for (var i = 0; i < $scope.cart.length; i++) {
+                    total += $scope.calculateItemPrice($scope.cart[i]);
+                }
+                return total;
+            };
+        });
+    </script>
+     <!-- footer section -->
+  <footer class="footer_section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 footer-col">
+          <div class="footer_contact">
+            <h4>
+              Contact Us
+            </h4>
+            <div class="contact_link_box">
+              <a href="">
+               
+                
+              </a>
+              <a href="">
+                <i class="fa fa-phone" aria-hidden="true"></i>
+                <span>
+                  Call +91 6361354299
+                </span>
+              </a>
+              <a href="">
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+                <span>
+                  divine@gmail.com
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 footer-col">
+          <div class="footer_detail">
+            <a href="" class="footer-logo">
+           Divine
+            </a>
+            <p>
+              Necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with
+            </p>
+            <!-- <div class="footer_social">
+              <a href="">
+                <i class="fa fa-facebook" aria-hidden="true"></i>
+              </a>
+              <a href="">
+                <i class="fa fa-twitter" aria-hidden="true"></i>
+              </a>
+              <a href="">
+                <i class="fa fa-linkedin" aria-hidden="true"></i>
+              </a>
+              <a href="">
+                <i class="fa fa-instagram" aria-hidden="true"></i>
+              </a>
+              <a href="">
+                <i class="fa fa-pinterest" aria-hidden="true"></i>
+              </a>
+            </div> -->
+          </div>
+        </div>
+        <div class="col-md-4 footer-col">
+          <h4>
+            Opening Hours
+          </h4>
+          <p>
+            Everyday
+          </p>
+          <p>
+            10.00 Am -10.00 Pm
+          </p>
+        </div>
+      </div>
+</body>
+
+</html>
